@@ -1,26 +1,34 @@
 // Reading excel file
 new_active_csv_file = "./Terra Dash-New and Active Wallets.csv"
 
-function ImportFile() {  
-    var excelUrl = new_active_csv_file;  
+var ExcelToJSON = function() {
 
-    var oReq = new XMLHttpRequest();  
-    oReq.open('get', excelUrl, true);  
-    oReq.responseType = 'blob';  
-    oReq.onload = function () {  
-        var blob = oReq.response;  
-        excelIO.open(blob, LoadSpread, function (message) {  
-            console.log(message);  
-        });  
-    };  
-    oReq.send(null);  
-}  
-function LoadSpread(json) {  
-    jsonData = json;  
-    workbook.fromJSON(json);  
+  this.parseExcel = function(file) {
+    var reader = new FileReader();
 
-    workbook.setActiveSheet("Revenues (Sales)");  
-}
+    reader.onload = function(e) {
+      var data = e.target.result;
+      var workbook = XLSX.read(data, {
+        type: 'binary'
+      });
+
+      workbook.SheetNames.forEach(function(sheetName) {
+        // Here is your object
+        var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+        var json_object = JSON.stringify(XL_row_object);
+        console.log(json_object);
+
+      })
+
+    };
+
+    reader.onerror = function(ex) {
+      console.log(ex);
+    };
+
+    reader.readAsBinaryString(file);
+  };
+};
 
 // An example of a plot using chart.js
 var xValues = [];
